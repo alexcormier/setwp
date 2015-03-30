@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/docopt/docopt-go"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"os"
@@ -11,29 +12,59 @@ import (
 	"path/filepath"
 )
 
-const dbPathRelative = "Library/Application Support/Dock/desktoppicture.db"
+const (
+	dbRelativePath = "Library/Application Support/Dock/desktoppicture.db"
+	dbStatements   = `
+		delete from data;
+		delete from preferences;
+		insert into data values (?);
+		insert into data values (?);
+		insert into preferences select 1, 1, ROWID from pictures;
+		insert into preferences select 2, 2, ROWID from pictures;
+	`
+	usage = `Sets wallpaper to <wallpaper>. Fills the screen by default.
 
-var dbStatements = [...]string{
-	"delete from data;",
-	"delete from preferences;",
-	"insert into data values (?);",
-	"insert into preferences select 1, 1, ROWID from pictures;",
-}
+Usage:
+  %[1]s [-f | -s | -c | -t] <wallpaper>
+  %[1]s -h | -v
+
+Options:
+  -f --fit      Fit wallpaper to screen.
+  -s --stretch  Stretch wallpaper to fill screen.
+  -c --center   Center wallpaper.
+  -t --tile     Tile wallpaper.
+  -h --help     Show this help message.
+  -v --version  Show version information.
+
+`
+	version = "%s version 0.1"
+)
+
+var positions = [...]string{"--fit", "--stretch", "--center", "--tile"}
 
 func main() {
 	log.SetFlags(0)
 
-	if len(os.Args) != 2 {
-		log.Fatalf("Usage: %s <wallpaper>", os.Args[0])
+	args, err := docopt.Parse(fmt.Sprintf(usage, os.Args[0]), nil, true, fmt.Sprintf(version, os.Args[0]), false)
+	if err != nil {
+		log.Fatalf("cannot parse arguments (%s)", err)
 	}
 
-	wallpaperPath := os.Args[1]
+	wallpaper := args["<wallpaper>"]
+
+	position := 5
+	for _, p := range positions {
+		if args[p].(bool) {
+			break
+		}
+		position--
+	}
 
 	home, err := homeDir()
 	if err != nil {
 		log.Fatalf("cannot open database", err)
 	}
-	dbPath := filepath.Join(home, dbPathRelative)
+	dbPath := filepath.Join(home, dbRelativePath)
 
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
@@ -41,10 +72,8 @@ func main() {
 	}
 	defer db.Close()
 
-	for _, statement := range dbStatements {
-		if _, err := db.Exec(statement, wallpaperPath); err != nil {
-			log.Fatalf("error updating database (%s)", err)
-		}
+	if _, err := db.Exec(dbStatements, wallpaper, position); err != nil {
+		log.Fatalf("error updating database (%s)", err)
 	}
 
 	if err := exec.Command("killall", "Dock").Run(); err != nil {

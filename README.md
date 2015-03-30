@@ -14,6 +14,6 @@ setwp <wallpaper>
 ~~~
 
 ## Todo
-- [ ] Option to set picture position (fill, fit, strech, center, tile)
+- [x] Option to set picture position (fill, fit, strech, center, tile)
 - [ ] Image validation
 - [ ] Set whole folder as wallpaper ?
