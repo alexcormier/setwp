@@ -15,8 +15,8 @@ Running `setwp <wallpaper>` will set \<wallpaper\> to fill the screen. For more 
 
 ~~~
 Usage:
-  setwp [-f | -s | -c | -t] <wallpaper>
-  setwp -h | -v
+  setwp [--fit | --stretch | --center | --tile] <wallpaper>
+  setwp --help | --version
 
 Options:
   -f --fit      Fit wallpaper to screen.

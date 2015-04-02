@@ -26,8 +26,8 @@ const (
 	usage = `Sets wallpaper to <wallpaper>. Fills the screen by default.
 
 Usage:
-  %[1]s [-f | -s | -c | -t] <wallpaper>
-  %[1]s -h | -v
+  %[1]s [--fit | --stretch | --center | --tile] <wallpaper>
+  %[1]s --help | --version
 
 Options:
   -f --fit      Fit wallpaper to screen.
