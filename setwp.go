@@ -6,13 +6,14 @@ import (
 	"github.com/docopt/docopt-go"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
-	"os"
 	"os/exec"
 	"os/user"
 	"path/filepath"
 )
 
 const (
+	programName = "setwp"
+
 	dbRelativePath = "Library/Application Support/Dock/desktoppicture.db"
 	dbStatements   = `
 		delete from data;
@@ -37,7 +38,7 @@ Options:
   -v --version  Show version information.
 
 `
-	version = "%s version 0.1"
+	version = "%s version 0.1.1"
 )
 
 var positions = [...]string{"--fit", "--stretch", "--center", "--tile"}
@@ -45,7 +46,7 @@ var positions = [...]string{"--fit", "--stretch", "--center", "--tile"}
 func main() {
 	log.SetFlags(0)
 
-	args, err := docopt.Parse(fmt.Sprintf(usage, os.Args[0]), nil, true, fmt.Sprintf(version, os.Args[0]), false)
+	args, err := docopt.Parse(fmt.Sprintf(usage, programName), nil, true, fmt.Sprintf(version, programName), false)
 	if err != nil {
 		log.Fatalf("cannot parse arguments (%s)", err)
 	}
