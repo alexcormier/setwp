@@ -16,4 +16,5 @@ setwp <wallpaper>
 ## Todo
 - [x] Option to set picture position (fill, fit, strech, center, tile)
 - [ ] Image validation
+- [ ] bash/zsh completion
 - [ ] Set whole folder as wallpaper ?
