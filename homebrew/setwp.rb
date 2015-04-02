@@ -6,10 +6,10 @@ class Setwp < Formula
 
     if Hardware.is_64_bit?
         url "https://github.com/alexandrecormier/setwp/releases/download/v#{version}/setwp-amd64-v#{version}.tar.gz"
-        sha1 'fca3b7dd0682090eced04ee277159250d851a679'
+        sha1 '9003f374a427724782b9b49776d639b7d6987e28'
     else
         url "https://github.com/alexandrecormier/setwp/releases/download/v#{version}/setwp-i386-v#{version}.tar.gz"
-        sha1 'd4a4f42e2eb7c827247d4946d60bc3b822b10124'
+        sha1 'aaa231ec22c565aef55b6313a074b4e458454527'
     end
 
     def install
