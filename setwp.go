@@ -77,7 +77,7 @@ func main() {
 	}
 
 	if err := exec.Command("killall", "Dock").Run(); err != nil {
-		log.Println("error killing Dock, wallpaper will be applied on your next login")
+		log.Println("error applying wallpaper, it will be applied on your next login")
 	}
 }
 
