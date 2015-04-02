@@ -1,1 +1,3 @@
-compdef _gnu_generic setwp
+#compdef setwp
+
+_gnu_generic setwp
