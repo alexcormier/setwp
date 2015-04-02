@@ -38,7 +38,7 @@ Options:
   -v --version  Show version information.
 
 `
-	version = "%s version 0.1.1"
+	version = "%s version 0.1.1-1"
 )
 
 var positions = [...]string{"--fit", "--stretch", "--center", "--tile"}
