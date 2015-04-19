@@ -18,10 +18,10 @@ const (
 	dbStatements   = `
 		delete from data;
 		delete from preferences;
-		insert into data values (?);
-		insert into data values (?);
-		insert into preferences select 1, 1, ROWID from pictures;
-		insert into preferences select 2, 2, ROWID from pictures;
+		insert into data values (?);                              -- path to wallpaper
+		insert into data values (?);                              -- wallpaper position
+		insert into preferences select 1, 1, ROWID from pictures; -- set wallpaper
+		insert into preferences select 2, 2, ROWID from pictures; -- set position
 	`
 	usage = `Sets wallpaper to <wallpaper>. Fills the screen by default.
 
