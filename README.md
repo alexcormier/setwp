@@ -22,10 +22,12 @@ Drop the `setwp-completion.bash` file in `~/.bash_completion`, `/etc/bash_comple
 Put the `setwp-completion.zsh` file in a folder that's in your fpath. To check what folders are in your fpath, run `echo $fpath`. To add a directory to your fpath, add `fpath+="<directory>"` to `~/.zshrc`.
 
 ## Usage
-Running `setwp <wallpaper>` will set \<wallpaper\> to fill the screen. For more options, see help :
 ~~~
+Sets wallpaper to <wallpaper>. Fills the screen by default.
+
 Usage:
   setwp [--fit | --stretch | --center | --tile] <wallpaper>
+  setwp (--interval=<s> | --login | --wake) [--random] [--fit | --stretch | --center | --tile] <directory>
   setwp --help | --version
 
 Options:
@@ -35,10 +37,19 @@ Options:
   -t --tile     Tile wallpaper.
   -h --help     Show this help message.
   -v --version  Show version information.
+
+Directory options:
+  -i --interval=<s>  Interval at which to change wallpaper in seconds.
+  -l --login         Change wallpaper when logging in.
+  -w --wake          Change wallpaper when waking from sleep.
+  -r --random        Randomize wallpaper selection.
 ~~~
+
+## Limitations
+When setting wallpaper to a directory, spaces and desktops are not synced. Having them in sync is outside the scope of this project, as setwp changes wallpaper settings and the OS changes the actual wallpaper.
 
 ## Todo
 - [x] Option to set picture position (fill, fit, strech, center, tile)
 - [ ] Image validation
 - [x] bash/zsh completion
-- [ ] Set whole folder as wallpaper ?
+- [x] Set whole folder as wallpaper ?

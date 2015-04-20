@@ -3,7 +3,8 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/docopt/docopt-go"
+	"github.com/alexandrecormier/setwp/args"
+	"github.com/alexandrecormier/setwp/pref"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"os/exec"
@@ -11,54 +12,44 @@ import (
 	"path/filepath"
 )
 
+type Args struct {
+}
+
 const (
 	programName = "setwp"
 
 	dbRelativePath = "Library/Application Support/Dock/desktoppicture.db"
-	dbStatements   = `
+
+	clearDBStatement = `
 		delete from data;
 		delete from preferences;
-		insert into data values (?);                              -- path to wallpaper
-		insert into data values (?);                              -- wallpaper position
-		insert into preferences select 1, 1, ROWID from pictures; -- set wallpaper
-		insert into preferences select 2, 2, ROWID from pictures; -- set position
 	`
-	usage = `Sets wallpaper to <wallpaper>. Fills the screen by default.
 
-Usage:
-  %[1]s [--fit | --stretch | --center | --tile] <wallpaper>
-  %[1]s --help | --version
-
-Options:
-  -f --fit      Fit wallpaper to screen.
-  -s --stretch  Stretch wallpaper to fill screen.
-  -c --center   Center wallpaper.
-  -t --tile     Tile wallpaper.
-  -h --help     Show this help message.
-  -v --version  Show version information.
-
-`
-	version = "%s version 0.1.1-1"
+	setPrefDBStatement = `
+		insert into data
+		select ?
+		where not exists (
+			select value
+			from data
+			where value = ?);
+	 	insert into preferences
+	 	select ?, data.ROWID, pictures.ROWID
+	 	from pictures
+	 	inner join data
+	 	on data.value = ?;
+	`
 )
 
-var positions = [...]string{"--fit", "--stretch", "--center", "--tile"}
+var (
+	success = false
+)
 
 func main() {
 	log.SetFlags(0)
 
-	args, err := docopt.Parse(fmt.Sprintf(usage, programName), nil, true, fmt.Sprintf(version, programName), false)
+	prefs, err := args.Parse()
 	if err != nil {
-		log.Fatalf("cannot parse arguments (%s)", err)
-	}
-
-	wallpaper := args["<wallpaper>"]
-
-	position := 5
-	for _, p := range positions {
-		if args[p].(bool) {
-			break
-		}
-		position--
+		log.Fatalf("%s", err)
 	}
 
 	home, err := homeDir()
@@ -73,12 +64,45 @@ func main() {
 	}
 	defer db.Close()
 
-	if _, err := db.Exec(dbStatements, wallpaper, position); err != nil {
+	tx, err := db.Begin()
+	if err != nil {
 		log.Fatalf("error updating database (%s)", err)
 	}
+	defer closeTx(tx)
+
+	clearDB(tx)
+	for _, p := range prefs {
+		setPref(tx, p)
+	}
+
+	success = true
 
 	if err := exec.Command("killall", "Dock").Run(); err != nil {
 		log.Println("error applying wallpaper, it will be applied on your next login")
+	}
+}
+
+func clearDB(tx *sql.Tx) {
+	if _, err := tx.Exec("delete from data; delete from preferences;"); err != nil {
+		log.Fatalf("error updating database (%s)", err)
+	}
+}
+
+func setPref(tx *sql.Tx, p pref.Pref) {
+	if _, err := tx.Exec(setPrefDBStatement, p.Value, p.Value, p.Key, p.Value); err != nil {
+		log.Fatalf("error updating database (%s)", err)
+	}
+}
+
+func closeTx(tx *sql.Tx) {
+	if success {
+		if err := tx.Commit(); err != nil {
+			log.Fatalf("error updating database (%s)", err)
+		}
+	} else {
+		if err := tx.Rollback(); err != nil {
+			log.Fatalf("error aborting database changes (%s)", err)
+		}
 	}
 }
 
