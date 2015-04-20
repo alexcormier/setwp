@@ -10,9 +10,19 @@ There are 3 ways to install.
 
 3. Download the binary for [32](https://github.com/alexandrecormier/setwp/releases/download/v0.1.1-1/setwp-i386-v0.1.1-1.tar.gz) or [64](https://github.com/alexandrecormier/setwp/releases/download/v0.1.1-1/setwp-amd64-v0.1.1-1.tar.gz) bit.
 
+### Completion
+If you want command completion, make sure you have installed the bash-completion or zsh-completions package, depending on your shell.
+
+If you installed with Homebrew, bash and zsh completion scripts are automatically installed; else you'll have to install them manually.
+
+#### bash
+Drop the `setwp-completion.bash` file in `~/.bash_completion`, `/etc/bash_completion.d`, or any other directory that gets sourced automatically.
+
+#### zsh
+Put the `setwp-completion.zsh` file in a folder that's in your fpath. To check what folders are in your fpath, run `echo $fpath`. To add a directory to your fpath, add `fpath+="<directory>"` to `~/.zshrc`.
+
 ## Usage
 Running `setwp <wallpaper>` will set \<wallpaper\> to fill the screen. For more options, see help :
-
 ~~~
 Usage:
   setwp [--fit | --stretch | --center | --tile] <wallpaper>
