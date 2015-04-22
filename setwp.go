@@ -46,7 +46,7 @@ func main() {
 
 	home, err := homeDir()
 	if err != nil {
-		log.Fatalf("cannot open database", err)
+		log.Fatalf("cannot open database (%s)", err)
 	}
 	dbPath := filepath.Join(home, dbRelativePath)
 
