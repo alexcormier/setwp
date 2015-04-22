@@ -1,3 +1,4 @@
+// Package position contains constants for the possible positions of the wallpaper.
 package position
 
 const (

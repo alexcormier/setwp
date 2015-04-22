@@ -3,21 +3,17 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/alexandrecormier/setwp/args"
-	"github.com/alexandrecormier/setwp/pref"
-	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"os/exec"
 	"os/user"
 	"path/filepath"
+
+	"github.com/alexandrecormier/setwp/args"
+	"github.com/alexandrecormier/setwp/pref"
+	_ "github.com/mattn/go-sqlite3"
 )
 
-type Args struct {
-}
-
 const (
-	programName = "setwp"
-
 	dbRelativePath = "Library/Application Support/Dock/desktoppicture.db"
 
 	clearDBStatement = `
@@ -38,10 +34,6 @@ const (
 	 	inner join data
 	 	on data.value = ?;
 	`
-)
-
-var (
-	success = false
 )
 
 func main() {
@@ -68,11 +60,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("error updating database (%s)", err)
 	}
-	defer closeTx(tx)
+	success := false
+	defer closeTx(tx, &success)
 
 	clearDB(tx)
-	for _, p := range prefs {
-		setPref(tx, p)
+	for key, value := range prefs {
+		setPref(tx, pref.Pref{Key: key, Value: value})
 	}
 
 	success = true
@@ -82,20 +75,23 @@ func main() {
 	}
 }
 
+// Clears the wallpaper preferences database.
 func clearDB(tx *sql.Tx) {
 	if _, err := tx.Exec("delete from data; delete from preferences;"); err != nil {
 		log.Fatalf("error updating database (%s)", err)
 	}
 }
 
+// Sets a preference in the database.
 func setPref(tx *sql.Tx, p pref.Pref) {
 	if _, err := tx.Exec(setPrefDBStatement, p.Value, p.Value, p.Key, p.Value); err != nil {
 		log.Fatalf("error updating database (%s)", err)
 	}
 }
 
-func closeTx(tx *sql.Tx) {
-	if success {
+// Commits or rollbacks the transaction depending on success.
+func closeTx(tx *sql.Tx, success *bool) {
+	if *success {
 		if err := tx.Commit(); err != nil {
 			log.Fatalf("error updating database (%s)", err)
 		}
@@ -106,6 +102,7 @@ func closeTx(tx *sql.Tx) {
 	}
 }
 
+// Gets the current user's home directory.
 func homeDir() (string, error) {
 	user, err := user.Current()
 	if err != nil {

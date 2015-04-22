@@ -1,13 +1,15 @@
+// Package args is the bridge between command line arguments and wallpaper preferences.
 package args
 
 import (
 	"fmt"
+	"os"
+	"strconv"
+
 	"github.com/alexandrecormier/setwp/pref"
 	"github.com/alexandrecormier/setwp/pref/event"
 	"github.com/alexandrecormier/setwp/pref/position"
 	"github.com/docopt/docopt-go"
-	"os"
-	"strconv"
 )
 
 const (
@@ -39,62 +41,68 @@ Directory options:
 	version = "%s version 1.0"
 )
 
-type arg struct {
-	flagPrefs  []pref.Pref
+// Type arg represents the preferences set by an argument.
+type argPrefs struct {
+	// Preferences to set when this argument is specified.
+	flagPrefs pref.Prefs
+
+	// Preferences to set to the value of this argument.
 	valuePrefs []pref.KeyType
-	value      func(interface{}) (interface{}, error)
+
+	// Function to validate and extract the preference's value from the argument's value.
+	value func(interface{}) (interface{}, error)
 }
 
 var (
-	defaultPrefs = []pref.Pref{
-		pref.Pref{pref.Position, position.Fill},
+	defaultPrefs = pref.Prefs{
+		pref.Position: position.Fill,
 	}
 
-	argMap = map[string]arg{
-		"--fit": arg{
-			flagPrefs:  []pref.Pref{pref.Pref{pref.Position, position.Fit}},
+	argMap = map[string]argPrefs{
+		"--fit": argPrefs{
+			flagPrefs:  pref.Prefs{pref.Position: position.Fit},
 			valuePrefs: []pref.KeyType{},
 			value:      func(value interface{}) (interface{}, error) { return value, nil },
 		},
-		"--stretch": arg{
-			flagPrefs:  []pref.Pref{pref.Pref{pref.Position, position.Stretch}},
+		"--stretch": argPrefs{
+			flagPrefs:  pref.Prefs{pref.Position: position.Stretch},
 			valuePrefs: []pref.KeyType{},
 			value:      func(value interface{}) (interface{}, error) { return value, nil },
 		},
-		"--center": arg{
-			flagPrefs:  []pref.Pref{pref.Pref{pref.Position, position.Center}},
+		"--center": argPrefs{
+			flagPrefs:  pref.Prefs{pref.Position: position.Center},
 			valuePrefs: []pref.KeyType{},
 			value:      func(value interface{}) (interface{}, error) { return value, nil },
 		},
-		"--tile": arg{
-			flagPrefs:  []pref.Pref{pref.Pref{pref.Position, position.Tile}},
+		"--tile": argPrefs{
+			flagPrefs:  pref.Prefs{pref.Position: position.Tile},
 			valuePrefs: []pref.KeyType{},
 			value:      func(value interface{}) (interface{}, error) { return value, nil },
 		},
-		"--interval": arg{
-			flagPrefs:  []pref.Pref{pref.Pref{pref.ChangeEvent, event.Interval}},
+		"--interval": argPrefs{
+			flagPrefs:  pref.Prefs{pref.ChangeEvent: event.Interval},
 			valuePrefs: []pref.KeyType{pref.Interval},
 			value: func(value interface{}) (interface{}, error) {
 				return strconv.ParseUint(value.(string), 10, 0)
 			},
 		},
-		"--login": arg{
-			flagPrefs:  []pref.Pref{pref.Pref{pref.ChangeEvent, event.Login}},
+		"--login": argPrefs{
+			flagPrefs:  pref.Prefs{pref.ChangeEvent: event.Login},
 			valuePrefs: []pref.KeyType{},
 			value:      func(value interface{}) (interface{}, error) { return value, nil },
 		},
-		"--wake": arg{
-			flagPrefs:  []pref.Pref{pref.Pref{pref.ChangeEvent, event.Wake}},
+		"--wake": argPrefs{
+			flagPrefs:  pref.Prefs{pref.ChangeEvent: event.Wake},
 			valuePrefs: []pref.KeyType{},
 			value:      func(value interface{}) (interface{}, error) { return value, nil },
 		},
-		"--random": arg{
-			flagPrefs:  []pref.Pref{pref.Pref{pref.Random, true}},
+		"--random": argPrefs{
+			flagPrefs:  pref.Prefs{pref.Random: true},
 			valuePrefs: []pref.KeyType{},
 			value:      func(value interface{}) (interface{}, error) { return value, nil },
 		},
-		"<wallpaper>": arg{
-			flagPrefs:  []pref.Pref{},
+		"<wallpaper>": argPrefs{
+			flagPrefs:  pref.Prefs{},
 			valuePrefs: []pref.KeyType{pref.Wallpaper},
 			value: func(value interface{}) (interface{}, error) {
 				info, err := os.Stat(value.(string))
@@ -107,8 +115,8 @@ var (
 				return value, nil
 			},
 		},
-		"<directory>": arg{
-			flagPrefs:  []pref.Pref{},
+		"<directory>": argPrefs{
+			flagPrefs:  pref.Prefs{},
 			valuePrefs: []pref.KeyType{pref.Directory},
 			value: func(value interface{}) (interface{}, error) {
 				info, err := os.Stat(value.(string))
@@ -124,24 +132,27 @@ var (
 	}
 )
 
-func Parse() ([]pref.Pref, error) {
+// Parse parses command line arguments and returns the preferences to apply or an error if there is any.
+// If the help or version flag is passed, the corresponding message is printed and the program exits.
+// If the arguments don't match one of the usage patterns, the usage message is printed and the program exits.
+func Parse() (pref.Prefs, error) {
 	parsedArgs := defaultPrefs
 	opts, err := docopt.Parse(fmt.Sprintf(usage, programName), nil, true, fmt.Sprintf(version, programName), false)
 	if err != nil {
-		return []pref.Pref{}, fmt.Errorf("cannot parse arguments (%s)", err)
+		return parsedArgs, fmt.Errorf("cannot parse arguments (%s)", err)
 	}
 	for optKey, optValue := range opts {
 		if b, ok := optValue.(bool); !ok && optValue != nil || b {
 			if a, ok := argMap[optKey]; ok {
-				for _, p := range a.flagPrefs {
-					parsedArgs = append(parsedArgs, p)
+				for key, value := range a.flagPrefs {
+					parsedArgs[key] = value
 				}
-				for _, pKey := range a.valuePrefs {
+				for _, key := range a.valuePrefs {
 					value, err := a.value(optValue)
 					if err != nil {
-						return []pref.Pref{}, err
+						return parsedArgs, err
 					}
-					parsedArgs = append(parsedArgs, pref.Pref{pKey, value})
+					parsedArgs[key] = value
 				}
 			}
 		}

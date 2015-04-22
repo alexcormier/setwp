@@ -49,7 +49,7 @@ Directory options:
 When setting wallpaper to a directory, spaces and desktops are not synced. Having them in sync is outside the scope of this project, as setwp changes wallpaper settings and the OS changes the actual wallpaper.
 
 ## Todo
-- [x] Option to set picture position (fill, fit, strech, center, tile)
+- [x] Option to set picture position (fill, fit, stretch, center, tile)
 - [ ] Image validation
 - [x] bash/zsh completion
 - [x] Set whole folder as wallpaper ?
