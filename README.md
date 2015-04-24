@@ -46,7 +46,7 @@ Directory options:
 ~~~
 
 ## Limitations
-When setting wallpaper to a directory, spaces and desktops are not synced. Having them in sync is outside the scope of this project, as setwp changes wallpaper settings and the OS changes the actual wallpaper.
+When setting wallpaper to a directory, spaces and desktops are not synced. Having them in sync is outside the scope of this project, as setwp changes wallpaper settings for all spaces and the OS changes the actual wallpaper.
 
 ## Todo
 - [x] Option to set picture position (fill, fit, stretch, center, tile)
