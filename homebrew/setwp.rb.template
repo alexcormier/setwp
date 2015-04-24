@@ -4,13 +4,10 @@ class Setwp < Formula
     homepage 'https://github.com/alexandrecormier/setwp'
     version '<VERSION>'
 
-    if Hardware.is_64_bit?
-        url "https://github.com/alexandrecormier/setwp/releases/download/v#{version}/setwp-amd64-v#{version}.tar.gz"
-        sha256 '<SHA256_64BIT>'
-    else
-        url "https://github.com/alexandrecormier/setwp/releases/download/v#{version}/setwp-i386-v#{version}.tar.gz"
-        sha256 '<SHA256_32BIT>'
-    end
+    depends_on :macos => :yosemite
+
+    url "https://github.com/alexandrecormier/setwp/releases/download/v#{version}/setwp-amd64-v#{version}.tar.gz"
+    sha256 '<SHA256_HASH>'
 
     def install
         bin.install 'setwp'
