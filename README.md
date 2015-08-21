@@ -8,7 +8,7 @@ There are 3 ways to install.
 
 2. With [Homebrew](http://brew.sh/) : `brew install https://raw.githubusercontent.com/alexandrecormier/setwp/master/homebrew/setwp.rb`.
 
-3. Download [the binary](https://github.com/alexandrecormier/setwp/releases/download/v0.1.1-1/setwp-amd64-v0.1.1-1.tar.gz).
+3. Download [the binary](https://github.com/alexandrecormier/setwp/releases/download/v1.0.1/setwp-v1.0.1.tar.gz).
 
 ### Completion
 If you want command completion, make sure you have installed the bash-completion or zsh-completions package, depending on your shell.
