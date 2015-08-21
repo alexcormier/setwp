@@ -38,7 +38,7 @@ Directory options:
 
 `
 
-	version = "%s version 1.0"
+	version = "%s version 1.0.1"
 )
 
 // Type arg represents the preferences set by an argument.
