@@ -6,7 +6,7 @@ class Setwp < Formula
 
     depends_on :macos => :yosemite
 
-    url "https://github.com/alexandrecormier/setwp/releases/download/v#{version}/setwp-amd64-v#{version}.tar.gz"
+    url "https://github.com/alexandrecormier/setwp/releases/download/v#{version}/setwp-v#{version}.tar.gz"
     sha256 '<SHA256_HASH>'
 
     def install
