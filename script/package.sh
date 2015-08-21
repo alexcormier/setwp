@@ -15,6 +15,9 @@ BREW_FORMULA="${PROJECT_FULL_PATH}/homebrew/${PROJECT_NAME}.rb"
 BREW_FORMULA_TEMPLATE="${BREW_FORMULA}.template"
 ARGS_FILE="${PROJECT_FULL_PATH}/args/args.go"
 
+# Bump version
+sed -E -i '' "s/version [0-9\.\-]+/version ${VERSION}/" "${ARGS_FILE}"
+
 # Build
 go install "${PROJECT_PATH}"
 
@@ -27,6 +30,3 @@ SHA256_HASH=`openssl dgst -sha256 ${TARBALL} | xxd -ps | tr -d '\n'`
 sed -e "s/<VERSION>/${VERSION}/g" \
     -e "s/<SHA256_HASH>/${SHA256_HASH}/" \
     "${BREW_FORMULA_TEMPLATE}" > "${BREW_FORMULA}"
-
-# Bump version
-sed -E -i '' "s/version [0-9\.\-]+/version ${VERSION}/" "${ARGS_FILE}"
