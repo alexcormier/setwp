@@ -6,6 +6,7 @@ if ! [[ $1 =~ [0-9\.\-] ]]; then
 fi
 
 VERSION="$1"
+SHORT_VERSION=`echo ${VERSION} | cut -f1 -d"-"`
 PROJECT_NAME='setwp'
 PROJECT_PATH="github.com/alexandrecormier/${PROJECT_NAME}"
 PROJECT_FULL_PATH="${GOPATH}/src/${PROJECT_PATH}"
@@ -16,7 +17,7 @@ BREW_FORMULA_TEMPLATE="${BREW_FORMULA}.template"
 ARGS_FILE="${PROJECT_FULL_PATH}/args/args.go"
 
 # Bump version
-sed -E -i '' "s/version [0-9\.\-]+/version ${VERSION}/" "${ARGS_FILE}"
+sed -E -i '' "s/version [0-9\.]+/version ${SHORT_VERSION}/" "${ARGS_FILE}"
 
 # Build
 go install "${PROJECT_PATH}"
