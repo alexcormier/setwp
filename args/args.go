@@ -110,7 +110,7 @@ var (
 					return value, err
 				}
 				if info.IsDir() {
-					return value, fmt.Errorf("invalid wallpaper; %s is a directory", value)
+					return value, fmt.Errorf("invalid wallpaper: %s is a directory", value)
 				}
 				return value, nil
 			},
@@ -132,28 +132,35 @@ var (
 	}
 )
 
-// Parse parses command line arguments and returns the preferences to apply or an error if there is any.
+// Parses command line arguments and returns the preferences to apply or an error if there is any.
 // If the help or version flag is passed, the corresponding message is printed and the program exits.
 // If the arguments don't match one of the usage patterns, the usage message is printed and the program exits.
 func Parse() (pref.Prefs, error) {
 	parsedArgs := defaultPrefs
-	opts, err := docopt.Parse(fmt.Sprintf(usage, programName), nil, true, fmt.Sprintf(version, programName), false)
+
+	opts, err := docopt.Parse(fmt.Sprintf(usage, programName), nil, true, fmt.Sprintf(version, programName), true)
 	if err != nil {
 		return parsedArgs, fmt.Errorf("cannot parse arguments (%s)", err)
 	}
+
 	for optKey, optValue := range opts {
 		if b, ok := optValue.(bool); !ok && optValue != nil || b {
-			if a, ok := argMap[optKey]; ok {
-				for key, value := range a.flagPrefs {
+			// this option has a value or is a flag and was specified
+			if argPref, ok := argMap[optKey]; ok {
+				// specifying this option has an effect that's not default so we process it
+				prefValue, err := argPref.value(optValue)
+				if err != nil {
+					return parsedArgs, err
+				}
+
+				for key, value := range argPref.flagPrefs {
 					parsedArgs[key] = value
 				}
-				for _, key := range a.valuePrefs {
-					value, err := a.value(optValue)
-					if err != nil {
-						return parsedArgs, err
-					}
-					parsedArgs[key] = value
+				for _, key := range argPref.valuePrefs {
+					parsedArgs[key] = prefValue
 				}
+			} else {
+
 			}
 		}
 	}
