@@ -27,7 +27,7 @@ mkdir -p releases
 tar -czf "${TARBALL}" completion/* -C "${BINARY_PATH}" "${PROJECT_NAME}"
 
 # Update homebrew formula
-SHA256_HASH=`openssl dgst -sha256 ${TARBALL} | xxd -ps | tr -d '\n'`
+SHA256_HASH=`openssl dgst -sha256 ${TARBALL} | cut -f2 -d" "`
 sed -e "s/<VERSION>/${VERSION}/g" \
     -e "s/<SHA256_HASH>/${SHA256_HASH}/" \
     "${BREW_FORMULA_TEMPLATE}" > "${BREW_FORMULA}"
