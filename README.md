@@ -6,7 +6,7 @@ There are 3 ways to install.
 
 1. As any other Go package : `go get github.com/alexandrecormier/setwp`.
 
-2. With [Homebrew](http://brew.sh/) : `brew install https://raw.githubusercontent.com/alexandrecormier/setwp/master/homebrew/setwp.rb`.
+2. With [Homebrew](http://brew.sh/) : `brew install alexandrecormier/personal/setwp`.
 
 3. Download [the binary](https://github.com/alexandrecormier/setwp/releases/download/v1.0.1/setwp-v1.0.1.tar.gz).
 
