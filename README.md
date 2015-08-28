@@ -1,5 +1,5 @@
 # setwp
-A command line utility to set the same wallpaper for every space and desktop on OS X Yosemite.
+A command line utility to set the same wallpaper settings for every space and desktop on OS X Yosemite.
 
 ## Installation
 There are 3 ways to install.
@@ -23,7 +23,8 @@ Put the `setwp-completion.zsh` file in a folder that's in your fpath. To check w
 
 ## Usage
 ~~~
-Sets wallpaper to <wallpaper>. Fills the screen by default.
+Sets wallpaper to <wallpaper> or a <directory> of wallpapers.
+Fills the screen by default.
 
 Usage:
   setwp [--fit | --stretch | --center | --tile] <wallpaper>
@@ -46,7 +47,7 @@ Directory options:
 ~~~
 
 ## Limitations
-When setting wallpaper to a directory, spaces and desktops are not synced. Having them in sync is outside the scope of this project, as setwp changes wallpaper settings for all spaces and the OS changes the actual wallpaper.
+When setting wallpaper to a directory, spaces and desktops are not synced. Having them in sync is outside the scope of this project, as setwp changes wallpaper settings for all spaces and lets the OS change the actual wallpaper.
 
 ## Todo
 - [x] Option to set picture position (fill, fit, stretch, center, tile)

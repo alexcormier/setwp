@@ -15,7 +15,8 @@ import (
 const (
 	programName = "setwp"
 
-	usage = `Sets wallpaper to <wallpaper>. Fills the screen by default.
+	usage = `Sets wallpaper to <wallpaper> or a <directory> of wallpapers.
+Fills the screen by default.
 
 Usage:
   %[1]s [--fit | --stretch | --center | --tile] <wallpaper>
@@ -38,7 +39,7 @@ Directory options:
 
 `
 
-	version = "%s version 1.0.1"
+	version = "%s version 1.0.2"
 )
 
 // Type arg represents the preferences set by an argument.
