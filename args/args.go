@@ -125,14 +125,18 @@ var (
 			flagPrefs:  pref.Prefs{},
 			valuePrefs: []pref.KeyType{pref.Directory},
 			value: func(value interface{}) (interface{}, error) {
-				info, err := os.Stat(value.(string))
+				path, err := filepath.Abs(value.(string))
 				if err != nil {
-					return value, err
+					return path, err
+				}
+				info, err := os.Stat(path)
+				if err != nil {
+					return path, err
 				}
 				if !info.IsDir() {
-					return value, fmt.Errorf("%s is not a directory", value)
+					return path, fmt.Errorf("%s is not a directory", path)
 				}
-				return value, nil
+				return path, nil
 			},
 		},
 	}
