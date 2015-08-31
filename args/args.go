@@ -4,6 +4,7 @@ package args
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/alexandrecormier/setwp/pref"
@@ -106,14 +107,18 @@ var (
 			flagPrefs:  pref.Prefs{},
 			valuePrefs: []pref.KeyType{pref.Wallpaper},
 			value: func(value interface{}) (interface{}, error) {
-				info, err := os.Stat(value.(string))
+				path, err := filepath.Abs(value.(string))
 				if err != nil {
-					return value, err
+					return path, err
+				}
+				info, err := os.Stat(path)
+				if err != nil {
+					return path, err
 				}
 				if info.IsDir() {
-					return value, fmt.Errorf("invalid wallpaper: %s is a directory", value)
+					return path, fmt.Errorf("invalid wallpaper: %s is a directory", value)
 				}
-				return value, nil
+				return path, nil
 			},
 		},
 		"<directory>": argPrefs{
