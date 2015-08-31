@@ -47,7 +47,8 @@ Directory options:
 ~~~
 
 ## Limitations
-When setting wallpaper to a directory, spaces and desktops are not synced. Having them in sync is outside the scope of this project, as setwp changes wallpaper settings for all spaces and lets the OS change the actual wallpaper.
+- When setting wallpaper to a directory, spaces and desktops are not synced. Having them in sync is outside the scope of this project, as setwp changes wallpaper settings for all spaces and lets the OS change the actual wallpaper.
+- When setting wallpaper to a directory, the search for images is not recursive. Only the images directly in the given directory will be used, not those in subdirectories.
 
 ## Todo
 - [x] Option to set picture position (fill, fit, stretch, center, tile)
