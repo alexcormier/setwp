@@ -1,5 +1,5 @@
 # setwp
-A command line utility to set the same wallpaper settings for every space and desktop on OS X Yosemite.
+A command line utility to set the same wallpaper settings for every space and desktop on OS X Yosemite and El Capitan.
 
 ## Installation
 There are 3 ways to install.
