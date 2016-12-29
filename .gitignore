@@ -1,5 +1,5 @@
 .DS_Store
 
 releases/
-*.sublime-project
-*.sublime-workspace
+
+setwp

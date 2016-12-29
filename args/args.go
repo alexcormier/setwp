@@ -2,6 +2,7 @@
 package args
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -16,24 +17,26 @@ import (
 const (
 	programName = "setwp"
 
-	usage = `Sets wallpaper to <wallpaper> or a <directory> of wallpapers.
+	usage = `Sets wallpaper to <wallpaper>, a <directory> of wallpapers or a solid color.
 Fills the screen by default.
 
 Usage:
-  %[1]s [--fit | --stretch | --center | --tile] <wallpaper>
-  %[1]s (--interval=<s> | --login | --wake) [--random] [--fit | --stretch | --center | --tile] <directory>
+  %[1]s [--fit | --stretch | --center | --tile] [--color=<hex>] <wallpaper>
+  %[1]s (--interval=<s> | --login | --wake) [--random] [--fit | --stretch | --center | --tile] [--color=<hex>] <directory>
+  %[1]s --color=<hex>
   %[1]s --help | --version
 
 Options:
-  -f --fit      Fit wallpaper to screen.
-  -s --stretch  Stretch wallpaper to fill screen.
-  -c --center   Center wallpaper.
-  -t --tile     Tile wallpaper.
-  -h --help     Show this help message.
-  -v --version  Show version information.
+  -f --fit          Fit wallpaper to screen.
+  -s --stretch      Stretch wallpaper to fill screen.
+  -c --center       Center wallpaper, scaling it down if it is too large.
+  -t --tile         Tile wallpaper.
+  -C --color=<hex>  Color to fill the screen with, as an RGB hex code.
+  -h --help         Show this help message.
+  -v --version      Show version information.
 
 Directory options:
-  -i --interval=<s>  Interval at which to change wallpaper in seconds.
+  -i --interval=<s>  Interval at which to change wallpaper, in seconds.
   -l --login         Change wallpaper when logging in.
   -w --wake          Change wallpaper when waking from sleep.
   -r --random        Randomize wallpaper selection.
@@ -42,6 +45,10 @@ Directory options:
 
 	version = "%s version 1.0.3"
 )
+
+type argument struct {
+	prefs func(value interface{}) (pref.Prefs, error)
+}
 
 // Type arg represents the preferences set by an argument.
 type argPrefs struct {
@@ -52,91 +59,119 @@ type argPrefs struct {
 	valuePrefs []pref.KeyType
 
 	// Function to validate and extract the preference's value from the argument's value.
-	value func(interface{}) (interface{}, error)
+	value func(interface{}) (pref.ValueType, error)
 }
 
 var (
 	defaultPrefs = pref.Prefs{
 		pref.Position: position.Fill,
+		pref.SolidColor: true,
 	}
 
-	argMap = map[string]argPrefs{
-		"--fit": argPrefs{
-			flagPrefs:  pref.Prefs{pref.Position: position.Fit},
-			valuePrefs: []pref.KeyType{},
-			value:      func(value interface{}) (interface{}, error) { return value, nil },
-		},
-		"--stretch": argPrefs{
-			flagPrefs:  pref.Prefs{pref.Position: position.Stretch},
-			valuePrefs: []pref.KeyType{},
-			value:      func(value interface{}) (interface{}, error) { return value, nil },
-		},
-		"--center": argPrefs{
-			flagPrefs:  pref.Prefs{pref.Position: position.Center},
-			valuePrefs: []pref.KeyType{},
-			value:      func(value interface{}) (interface{}, error) { return value, nil },
-		},
-		"--tile": argPrefs{
-			flagPrefs:  pref.Prefs{pref.Position: position.Tile},
-			valuePrefs: []pref.KeyType{},
-			value:      func(value interface{}) (interface{}, error) { return value, nil },
-		},
-		"--interval": argPrefs{
-			flagPrefs:  pref.Prefs{pref.ChangeEvent: event.Interval},
-			valuePrefs: []pref.KeyType{pref.Interval},
-			value: func(value interface{}) (interface{}, error) {
-				return strconv.ParseUint(value.(string), 10, 0)
+	argMap = map[string]argument{
+		"--fit": argument{
+			prefs: func(value interface{}) (pref.Prefs, error) {
+				return pref.Prefs{pref.Position: position.Fit}, nil
 			},
 		},
-		"--login": argPrefs{
-			flagPrefs:  pref.Prefs{pref.ChangeEvent: event.Login},
-			valuePrefs: []pref.KeyType{},
-			value:      func(value interface{}) (interface{}, error) { return value, nil },
+		"--stretch": argument{
+			prefs: func(value interface{}) (pref.Prefs, error) {
+				return pref.Prefs{pref.Position: position.Stretch}, nil
+			},
 		},
-		"--wake": argPrefs{
-			flagPrefs:  pref.Prefs{pref.ChangeEvent: event.Wake},
-			valuePrefs: []pref.KeyType{},
-			value:      func(value interface{}) (interface{}, error) { return value, nil },
+		"--center": argument{
+			prefs: func(value interface{}) (pref.Prefs, error) {
+				return pref.Prefs{pref.Position: position.Center}, nil
+			},
 		},
-		"--random": argPrefs{
-			flagPrefs:  pref.Prefs{pref.Random: true},
-			valuePrefs: []pref.KeyType{},
-			value:      func(value interface{}) (interface{}, error) { return value, nil },
+		"--tile": argument{
+			prefs: func(value interface{}) (pref.Prefs, error) {
+				return pref.Prefs{pref.Position: position.Tile}, nil
+			},
 		},
-		"<wallpaper>": argPrefs{
-			flagPrefs:  pref.Prefs{},
-			valuePrefs: []pref.KeyType{pref.Wallpaper},
-			value: func(value interface{}) (interface{}, error) {
+		"--color": argument{
+			prefs: func(value interface{}) (pref.Prefs, error) {
+				colorString := value.(string)
+				if len(colorString) == 6 {
+					color, err := strconv.ParseUint(colorString, 16, 32)
+					if err == nil {
+						prefs := pref.Prefs{
+							pref.Red: float64((color >> 16) & 0xFF) / 255,
+							pref.Green: float64((color >> 8) & 0xFF) / 255,
+							pref.Blue: float64(color & 0xFF) / 255,
+						}
+						return prefs, nil
+					}
+				}
+				return nil, errors.New("invalid color")
+			},
+		},
+		"--interval": argument{
+			prefs: func(value interface{}) (pref.Prefs, error) {
+				interval, err := strconv.ParseUint(value.(string), 10, 0)
+				if err != nil {
+					return nil, errors.New("invalid interval")
+				}
+				prefs := pref.Prefs{
+					pref.ChangeEvent: event.Interval,
+					pref.Interval: interval,
+				}
+				return prefs, nil
+			},
+		},
+		"--login": argument{
+			prefs: func(value interface{}) (pref.Prefs, error) {
+				return pref.Prefs{pref.ChangeEvent: event.Login}, nil
+			},
+		},
+		"--wake": argument{
+			prefs: func(value interface{}) (pref.Prefs, error) {
+				return pref.Prefs{pref.ChangeEvent: event.Wake}, nil
+			},
+		},
+		"--random": argument{
+			prefs: func(value interface{}) (pref.Prefs, error) {
+				return pref.Prefs{pref.Random: true}, nil
+			},
+		},
+		"<wallpaper>": argument{
+			prefs: func(value interface{}) (pref.Prefs, error) {
 				path, err := filepath.Abs(value.(string))
 				if err != nil {
-					return path, err
+					return nil, fmt.Errorf("invalid wallpaper '%s': %v", value, err)
 				}
 				info, err := os.Stat(path)
 				if err != nil {
-					return path, err
+					return nil, fmt.Errorf("invalid wallpaper '%s': %v", value, err.(*os.PathError).Err)
 				}
 				if info.IsDir() {
-					return path, fmt.Errorf("invalid wallpaper: %s is a directory", value)
+					return nil, fmt.Errorf("invalid wallpaper: %s is a directory", value)
 				}
-				return path, nil
+				prefs := pref.Prefs{
+					pref.Wallpaper: path,
+					pref.SolidColor: false,
+				}
+				return prefs, nil
 			},
 		},
-		"<directory>": argPrefs{
-			flagPrefs:  pref.Prefs{},
-			valuePrefs: []pref.KeyType{pref.Directory},
-			value: func(value interface{}) (interface{}, error) {
+		"<directory>": argument{
+			prefs: func(value interface{}) (pref.Prefs, error) {
 				path, err := filepath.Abs(value.(string))
 				if err != nil {
-					return path, err
+					return nil, fmt.Errorf("invalid wallpaper '%s': %v", value, err)
 				}
 				info, err := os.Stat(path)
 				if err != nil {
-					return path, err
+					return nil, fmt.Errorf("invalid wallpaper '%s': %v", value, err.(*os.PathError).Err)
 				}
 				if !info.IsDir() {
-					return path, fmt.Errorf("%s is not a directory", path)
+					return nil, fmt.Errorf("%s is not a directory", path)
 				}
-				return path, nil
+				prefs := pref.Prefs{
+					pref.Directory: path,
+					pref.SolidColor: false,
+				}
+				return prefs, nil
 			},
 		},
 	}
@@ -156,21 +191,19 @@ func Parse() (pref.Prefs, error) {
 	for optKey, optValue := range opts {
 		if b, ok := optValue.(bool); !ok && optValue != nil || b {
 			// this option has a value or is a flag and was specified
-			if argPref, ok := argMap[optKey]; ok {
+			if argument, ok := argMap[optKey]; ok {
 				// specifying this option has an effect that's not default so we process it
-				prefValue, err := argPref.value(optValue)
+
+				prefs, err := argument.prefs(optValue)
 				if err != nil {
 					return parsedArgs, err
 				}
 
-				for key, value := range argPref.flagPrefs {
+				for key, value := range prefs {
 					parsedArgs[key] = value
 				}
-				for _, key := range argPref.valuePrefs {
-					parsedArgs[key] = prefValue
-				}
 			} else {
-
+				// this option was not specified
 			}
 		}
 	}

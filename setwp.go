@@ -73,7 +73,7 @@ func run() int {
 		return handleDbWriteError(err)
 	}
 	for key, value := range prefs {
-		if err := setPref(tx, pref.Pref{Key: key, Value: value}); err != nil {
+		if err := setPref(tx, key, value); err != nil {
 			return handleDbWriteError(err)
 		}
 	}
@@ -94,8 +94,8 @@ func clearDB(tx *sql.Tx) error {
 }
 
 // Sets a preference in the database.
-func setPref(tx *sql.Tx, p pref.Pref) error {
-	_, err := tx.Exec(setPrefDBStatement, p.Value, p.Value, p.Key, p.Value)
+func setPref(tx *sql.Tx, key pref.KeyType, value pref.ValueType) error {
+	_, err := tx.Exec(setPrefDBStatement, value, value, key, value)
 	return err
 }
 
