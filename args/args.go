@@ -43,7 +43,7 @@ Directory options:
 
 `
 
-	version = "%s version 1.0.3"
+	version = "%s version 1.1.0"
 )
 
 type argument struct {
