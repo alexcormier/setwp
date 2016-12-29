@@ -8,7 +8,7 @@ fi
 VERSION="$1"
 SHORT_VERSION=`echo ${VERSION} | cut -f1 -d"-"`
 PROJECT_NAME='setwp'
-PROJECT_PATH="github.com/alexandrecormier/${PROJECT_NAME}"
+PROJECT_PATH="github.com/alexcormier/${PROJECT_NAME}"
 PROJECT_FULL_PATH="${GOPATH}/src/${PROJECT_PATH}"
 BINARY_PATH="${GOPATH}/bin"
 TARBALL="${PROJECT_FULL_PATH}/releases/${PROJECT_NAME}-v${VERSION}.tar.gz"

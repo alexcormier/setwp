@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/alexandrecormier/setwp/pref"
-	"github.com/alexandrecormier/setwp/pref/event"
-	"github.com/alexandrecormier/setwp/pref/position"
+	"github.com/alexcormier/setwp/pref"
+	"github.com/alexcormier/setwp/pref/event"
+	"github.com/alexcormier/setwp/pref/position"
 	"github.com/docopt/docopt-go"
 )
 

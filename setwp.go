@@ -9,8 +9,8 @@ import (
 	"os/user"
 	"path/filepath"
 
-	"github.com/alexandrecormier/setwp/args"
-	"github.com/alexandrecormier/setwp/pref"
+	"github.com/alexcormier/setwp/args"
+	"github.com/alexcormier/setwp/pref"
 	_ "github.com/mattn/go-sqlite3"
 )
 

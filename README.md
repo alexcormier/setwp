@@ -4,11 +4,11 @@ A command line utility to set the same wallpaper settings for every space and de
 ## Installation
 There are 3 ways to install.
 
-1. As any other Go package : `go get github.com/alexandrecormier/setwp`.
+1. As any other Go package : `go get github.com/alexcormier/setwp`.
 
-2. With [Homebrew](http://brew.sh/) : `brew install alexandrecormier/personal/setwp`.
+2. With [Homebrew](http://brew.sh/) : `brew install alexcormier/personal/setwp`.
 
-3. Download [the binary](https://github.com/alexandrecormier/setwp/releases/download/v1.0.3/setwp-v1.0.3.tar.gz).
+3. Download [the binary](https://github.com/alexcormier/setwp/releases/download/v1.0.3/setwp-v1.0.3.tar.gz).
 
 ### Completion
 If you want command completion, make sure you have installed the bash-completion or zsh-completions package, depending on your shell.
