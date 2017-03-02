@@ -21,19 +21,22 @@ const (
 Fills the screen by default.
 
 Usage:
-  %[1]s [--fit | --stretch | --center | --tile] [--color=<hex>] <wallpaper>
-  %[1]s (--interval=<s> | --login | --wake) [--random] [--fit | --stretch | --center | --tile] [--color=<hex>] <directory>
+  %[1]s [--fill | --fit | --stretch | --center | --tile] [--color=<hex>] <wallpaper>
+  %[1]s (--interval=<s> | --login | --wake) [--random] [--fill | --fit | --stretch | --center | --tile] [--color=<hex>] <directory>
   %[1]s --color=<hex>
   %[1]s --help | --version
 
 Options:
+  -C --color=<hex>  Color to fill the screen with, as an RGB hex code.
+  -h --help         Show this help message.
+  -v --version      Show version information.
+
+Fit options:
+  -F --fill         Scale wallpaper to fill screen [default].
   -f --fit          Fit wallpaper to screen.
   -s --stretch      Stretch wallpaper to fill screen.
   -c --center       Center wallpaper, scaling it down if it is too large.
   -t --tile         Tile wallpaper.
-  -C --color=<hex>  Color to fill the screen with, as an RGB hex code.
-  -h --help         Show this help message.
-  -v --version      Show version information.
 
 Directory options:
   -i --interval=<s>  Interval at which to change wallpaper, in seconds.
