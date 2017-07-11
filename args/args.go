@@ -11,7 +11,7 @@ import (
 	"github.com/alexcormier/setwp/pref"
 	"github.com/alexcormier/setwp/pref/event"
 	"github.com/alexcormier/setwp/pref/position"
-	"github.com/docopt/docopt-go"
+	docopt "github.com/docopt/docopt-go"
 )
 
 const (
@@ -67,7 +67,7 @@ type argPrefs struct {
 
 var (
 	defaultPrefs = pref.Prefs{
-		pref.Position: position.Fill,
+		pref.Position:   position.Fill,
 		pref.SolidColor: true,
 	}
 
@@ -99,9 +99,9 @@ var (
 					color, err := strconv.ParseUint(colorString, 16, 32)
 					if err == nil {
 						prefs := pref.Prefs{
-							pref.Red: float64((color >> 16) & 0xFF) / 255,
-							pref.Green: float64((color >> 8) & 0xFF) / 255,
-							pref.Blue: float64(color & 0xFF) / 255,
+							pref.Red:   float64((color>>16)&0xFF) / 255,
+							pref.Green: float64((color>>8)&0xFF) / 255,
+							pref.Blue:  float64(color&0xFF) / 255,
 						}
 						return prefs, nil
 					}
@@ -117,7 +117,7 @@ var (
 				}
 				prefs := pref.Prefs{
 					pref.ChangeEvent: event.Interval,
-					pref.Interval: interval,
+					pref.Interval:    interval,
 				}
 				return prefs, nil
 			},
@@ -151,7 +151,7 @@ var (
 					return nil, fmt.Errorf("invalid wallpaper: %s is a directory", value)
 				}
 				prefs := pref.Prefs{
-					pref.Wallpaper: path,
+					pref.Wallpaper:  path,
 					pref.SolidColor: false,
 				}
 				return prefs, nil
@@ -170,8 +170,10 @@ var (
 				if !info.IsDir() {
 					return nil, fmt.Errorf("%s is not a directory", path)
 				}
+
 				prefs := pref.Prefs{
-					pref.Directory: path,
+					pref.Directory:  path,
+					pref.Current:    path, // partial fix for recent macOS versions (see issue #3)
 					pref.SolidColor: false,
 				}
 				return prefs, nil
@@ -180,7 +182,7 @@ var (
 	}
 )
 
-// Parses command line arguments and returns the preferences to apply or an error if there is any.
+// Parse command line arguments and returns the preferences to apply or an error if there is any.
 // If the help or version flag is passed, the corresponding message is printed and the program exits.
 // If the arguments don't match one of the usage patterns, the usage message is printed and the program exits.
 func Parse() (pref.Prefs, error) {
