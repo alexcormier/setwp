@@ -18,8 +18,8 @@ const (
 	dbRelativePath = "Library/Application Support/Dock/desktoppicture.db"
 
 	clearDBStatement = `
-		delete from data;
 		delete from preferences;
+		delete from data;
 	`
 
 	setPrefDBStatement = `
@@ -38,7 +38,6 @@ const (
 )
 
 func main() {
-	// call another function to properly run defers
 	os.Exit(run())
 }
 
@@ -56,6 +55,17 @@ func run() int {
 	}
 	dbPath := filepath.Join(home, dbRelativePath)
 
+	if ret := changeWallpaperSettings(dbPath, prefs); ret != 0 {
+		return ret
+	}
+	if ret := restartDock(); ret != 0 {
+		return ret
+	}
+
+	return 0
+}
+
+func changeWallpaperSettings(dbPath string, prefs pref.Prefs) int {
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		return handleDbReadError(err)
@@ -79,11 +89,14 @@ func run() int {
 	}
 
 	success = true
+	return 0
+}
 
+func restartDock() int {
 	if err := exec.Command("killall", "Dock").Run(); err != nil {
 		log.Println("error applying wallpaper, it will be applied on your next login")
+		return 100
 	}
-
 	return 0
 }
 
